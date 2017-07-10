@@ -6,15 +6,20 @@ import math
 #------------------------------------------------------------------------------
 #           LORENZ '63 ("butterfly") - define system
 #------------------------------------------------------------------------------
-def Lorenz63(params, pos, *t):        #where pos is an array of length 3, and params is [rho, sigma, beta]
+def Lorenz63(pos, *params **t):        #where pos is an array of length 3, and params is rho, sigma, beta
     """System of equations resulting in a 'butterfly attractor'. Derived in Lorenz(1963). Takes 3 parameters and 3-dimensional array of positions."""  
     #default values for params:
     #rho = 28
     #sigma = 10
     #beta = 8/3
-    rho = params[0]
-    sigma = params[1]
-    beta = params[2]
+    if len(params[0]) >= 3:
+        rho = params[0][0]
+        sigma = params[0][1]
+        beta = params[0][2]
+    else:
+        rho = 28
+        sigma = 10
+        beta = 8/3
     
     v = [1,1,1]    #placeholder
     
@@ -27,17 +32,23 @@ def Lorenz63(params, pos, *t):        #where pos is an array of length 3, and pa
 #------------------------------------------------------------------------------
 #           LORENZ '84 - define system
 #------------------------------------------------------------------------------
-def Lorenz84(params, pos, t):              #where pos is an array of length 3 and params is [a, b, F, G]
+def Lorenz84(pos, *params, **t):              #where pos is an array of length 3 and params is [a, b, F, G]
     """System of 3 equations with 3 variables and 4 parameters derived in Lorenz(1984)."""
     #default values for params:
     #a = 0.25
     #b = 4
     #F = 8
     #G = 1.25
-    a = params[0]
-    b = params[1]
-    F = params[2]
-    G = params[3]
+    if len(params[0]) >= 4:
+        a = params[0][0]
+        b = params[0][1]
+        F = params[0][2]
+        G = params[0][3]
+    else:
+        a = 0.25
+        b = 4
+        F = 8
+        G = 1.25
     
     v = [1,1,1]
     
@@ -50,11 +61,14 @@ def Lorenz84(params, pos, t):              #where pos is an array of length 3 an
 #------------------------------------------------------------------------------
 #           TEST 3-var
 #------------------------------------------------------------------------------
-def Test(params, pos, t):
+def Test(pos, *params, **t):
     """Simple test function to verify that various functions work consistently."""
     #default values for params:
     #a = 1
-    a = params[0]
+    if len(params[0]) >= 1:
+        a = params[0][0]
+    else:
+        a = 1
     
     v = [1,1,1]
     
