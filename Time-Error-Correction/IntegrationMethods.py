@@ -22,7 +22,7 @@ def eulers_method(f, pos, time, dt, *params):      #currently only works for aut
 #------------------------------------------------------------------------------ 
 #           RK2 - TWO-STEP RUNGE KUTTA
 #------------------------------------------------------------------------------        
-def rk2_3var(f, pos, time, dt, *params):         #currently only works for autonomous systems
+def rk2(f, pos, time, dt, *params):         #currently only works for autonomous systems
     """Third-order Runge-Kutta."""
     k1 = pos #placeholder
     k2 = pos #placeholder
@@ -48,7 +48,7 @@ def rk2_3var(f, pos, time, dt, *params):         #currently only works for auton
 #------------------------------------------------------------------------------
 #           RK4 - FOUR-STEP RUNGE KUTTA
 #------------------------------------------------------------------------------            
-def rk4_3var(f, params, pos, time, dt):         #currently only works for autonomous systems    
+def rk4(f, params, pos, time, dt):         #currently only works for autonomous systems    
     """Fourth-order Runge-Kutta"""
     k1 = pos #placeholder
     k2 = pos #placeholder
