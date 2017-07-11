@@ -2,20 +2,27 @@
 """Contains methods for data assimilation."""
 
 
-import numpy as stats
+import numpy as analytics
+from scipy import stats
 import math
+
+
+
+
+
 
 def get_posterior(ensembleValues, observation, observationError):
     """
     Assuming normality, uses Bayes' Rule to find the posterior distribution from an ensemble/prior and an observation distribution.
+    
     Takes ensembleValues (observed only, as returned by get_observed_values_from_ensemble), observation as array of varuable values in same order as ensemble, and assumed error in observations.
     """
     #Convenience
     numberOfVariables = len(ensembleValues)    
     
     #Priors    
-    ensembleMeans = [stats.mean(valueList) for valueList in ensembleValues]
-    ensembleSpreads = [stats.std(valueList) for valueList in ensembleValues]
+    ensembleMeans = [analytics.mean(valueList) for valueList in ensembleValues]
+    ensembleSpreads = [analytics.std(valueList) for valueList in ensembleValues]
     
     #Compute Posterior 
     posteriorMeans = []
@@ -47,4 +54,29 @@ def get_posterior(ensembleValues, observation, observationError):
             posteriorMeans.append((posteriorSpreads[-1]**2)*(ensembleMeans[variable]*ensembleSpreads[variable]**-2 + observation[variable]*observationError[variable]**-2))
             
     return posteriorSpreads, posteriorMeans
+    
+    
+    
+    
+    
 
+def regress_obs_incs(ensembleValues, observationIncrements):
+    """
+    Regresses observation increments onto other variables for each observed variable.
+    
+    Takes ensembleValues(with observedStatus) and observation increments. Length of observationIncrements should equal that of ensembleValues.
+    """
+    for observed in range(len(observationIncrements)):
+        if ensembleValues[observed][0]:
+            for unobserved in range(len(observationIncrements)):
+                slope, intercept, r_value, p_value, std_err = stats.linregress(ensembleValues[observed],ensembleValues[unobserved])
+                for point in range(len(ensembleValues[0][1])):  #Apply increments
+                    ensembleValues[unobserved][1][point] += observationIncrements[observed][point]*slope
+    return ensembleValues
+                    
+                
+                
+            
+            
+    
+    

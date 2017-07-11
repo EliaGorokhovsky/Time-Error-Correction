@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Jul 11 12:54:21 2017
+"""Mainfile for running the experimental code."""
 
-@author: eliag
-"""
+
 

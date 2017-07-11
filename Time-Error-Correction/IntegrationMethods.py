@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """A collection of functions to approximately solve differential equations."""
 
+
 #------------------------------------------------------------------------------
 #           EULER'S METHOD - ONE STEP
 #------------------------------------------------------------------------------
