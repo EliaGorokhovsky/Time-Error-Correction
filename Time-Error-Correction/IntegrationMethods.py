@@ -20,6 +20,11 @@ def eulers_method(f, pos, time, dt, *params):      #currently only works for aut
     for i in range(len(pos)):
         pos[i] += k[i]
     return pos
+    
+    
+    
+    
+    
 #------------------------------------------------------------------------------ 
 #           RK2 - TWO-STEP RUNGE KUTTA
 #------------------------------------------------------------------------------        
@@ -46,6 +51,11 @@ def rk2(f, pos, time, dt, *params):         #currently only works for autonomous
         pos[i] += k2[i]
     
     return pos
+    
+    
+    
+    
+    
 #------------------------------------------------------------------------------
 #           RK4 - FOUR-STEP RUNGE KUTTA
 #------------------------------------------------------------------------------            

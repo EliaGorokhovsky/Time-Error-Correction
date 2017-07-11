@@ -73,7 +73,32 @@ def regress_obs_incs(ensembleValues, observationIncrements):
                 for point in range(len(ensembleValues[0][1])):  #Apply increments
                     ensembleValues[unobserved][1][point] += observationIncrements[observed][point]*slope
     return ensembleValues
-                    
+    
+
+
+
+
+def obs_incs_EAKF(ensembleValues, posteriorMeans, posteriorSpreads):
+    """
+    Calculates observation increments based on prior and posterior distributions.
+    
+    Takes ensemble values like get_posterior and information about posterior analogous to output of get_posterior.
+    Returns observation increments.
+    """                    
+    #Priors    
+    ensembleMeans = [analytics.mean(valueList) for valueList in ensembleValues]
+    ensembleSpreads = [analytics.std(valueList) for valueList in ensembleValues]
+    observedIncrements = [[] for valueList in ensembleValues]
+    for var in range(len(ensembleValues)):
+        meanDifference = posteriorMeans[var] - ensembleMeans[var]
+        spreadRatio = posteriorSpreads[var] / ensembleSpreads[var]
+        for point in ensembleValues[var]:
+            newValue = point + meanDifference
+            distanceFromPosteriorMean = newValue - posteriorMeans[var]
+            distanceFromPosteriorMean *= spreadRatio
+            observedIncrements[var].append(posteriorMeans[var] + distanceFromPosteriorMean)
+    return observedIncrements
+        
                 
                 
             

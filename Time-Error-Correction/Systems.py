@@ -32,6 +32,10 @@ def Lorenz63(pos, *params **t):        #where pos is an array of length 3, and p
     
     return v    #returns instantaneous rate of change
     
+    
+    
+    
+    
 #------------------------------------------------------------------------------
 #           LORENZ '84 - define system
 #------------------------------------------------------------------------------
@@ -60,6 +64,10 @@ def Lorenz84(pos, *params, **t):              #where pos is an array of length 3
     v[2] = (b*pos[0]*pos[1]) + (pos[0]*pos[2]) - pos[2]
     
     return v    #returns instantaneous rate of change
+    
+    
+    
+    
     
 #------------------------------------------------------------------------------
 #           TEST 3-var

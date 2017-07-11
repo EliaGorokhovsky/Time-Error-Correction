@@ -18,6 +18,9 @@ def get_values_from_ensemble(ensemble, observedStatus):
     return values
     
 
+
+
+
 def get_observed_values_from_ensemble(values):
     """
     Converts array of values (analogous to output of get_values_from_ensemble) into arrays of observed values.
@@ -28,6 +31,10 @@ def get_observed_values_from_ensemble(values):
         if i[0]:
             observedValues.append(i[1])
     return observedValues
+
+
+
+
     
 def get_ensemble_from_observed_values(values):
     """
