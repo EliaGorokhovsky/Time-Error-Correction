@@ -7,7 +7,7 @@ import math
 #------------------------------------------------------------------------------
 #           LORENZ '63 ("butterfly") - define system
 #------------------------------------------------------------------------------
-def Lorenz63(pos, *params **t):        #where pos is an array of length 3, and params is rho, sigma, beta
+def Lorenz63(pos, *params, **t):        #where pos is an array of length 3, and params is rho, sigma, beta
     """System of equations resulting in a 'butterfly attractor'. Derived in Lorenz(1963). 
     
     Takes 3 parameters and 3-dimensional array of positions."""  
