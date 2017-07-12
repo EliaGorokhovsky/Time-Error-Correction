@@ -3,8 +3,9 @@
 
 
 import numpy as analytics
-from scipy import stats
-import math
+from scipy import stats     
+import math                 
+import EnsembleOperations   
 
 
 
@@ -15,7 +16,7 @@ def get_posterior(ensembleValues, observation, observationError):
     """
     Assuming normality, uses Bayes' Rule to find the posterior distribution from an ensemble/prior and an observation distribution.
     
-    Takes ensembleValues (observed only, as returned by get_observed_values_from_ensemble), observation as array of varuable values in same order as ensemble, and assumed error in observations.
+    Takes ensembleValues (observed only, as returned by get_observed_values_from_ensemble), observation as array of variable values in same order as ensemble, and assumed error in observations.
     """
     #Convenience
     numberOfVariables = len(ensembleValues)    
@@ -98,8 +99,25 @@ def obs_incs_EAKF(ensembleValues, posteriorMeans, posteriorSpreads):
             distanceFromPosteriorMean *= spreadRatio
             observedIncrements[var].append(posteriorMeans[var] + distanceFromPosteriorMean)
     return observedIncrements
+
         
-                
+        
+        
+        
+        
+def EAKF(ensemble, observation, observationError, observedStatus):
+    """
+    Performs an EAKF assimilation with linear regression. 
+    
+    Takes ensemble in standard format, observation, assumed observation error, observedStatus as array with length = number of variables. Returns ensemble.
+    """
+    ensembleValues = EnsembleOperations.get_values_from_ensemble(ensemble, observedStatus)
+    observedValues = EnsembleOperations.get_observed_values_from_ensemble(ensembleValues)
+    posteriorSpreads, posteriorMeans = get_posterior(observedValues, observation, observationError)
+    observedIncrements = obs_incs_EAKF(observedValues, posteriorMeans, posteriorSpreads)
+    newEnsembleValues = regress_obs_incs(ensembleValues, observedIncrements)
+    newEnsemble = EnsembleOperations.get_ensemble_from_values(newEnsembleValues)
+    return newEnsemble
                 
             
             

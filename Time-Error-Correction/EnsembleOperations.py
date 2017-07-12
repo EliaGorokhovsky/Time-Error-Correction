@@ -36,9 +36,9 @@ def get_observed_values_from_ensemble(values):
 
 
     
-def get_ensemble_from_observed_values(values):
+def get_ensemble_from_values(values):
     """
-    Converts 2-d array of values (analogous to output of get_observed_values_from_ensemble) into standard ensemble format.
+    Converts 2-d array of values (analogous to output of get_values_from_ensemble) into standard ensemble format.
     """
     ensemble = [[] for i in range(len(values[0][1]))]
     for var in range(len(values)):
