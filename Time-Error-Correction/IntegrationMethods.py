@@ -7,12 +7,12 @@
 #------------------------------------------------------------------------------
 def eulers_method(f, pos, time, dt, *params):      #currently only works for autonomous systems
     """Simple linear approximation."""
-    k = pos
+    k = list(pos)
     #Default values for parameters
     if params != ():
         params = params[0]
     else:
-        params = 1
+        params = None
         
     for i in range(len(pos)): 
         k[i] = dt*f(pos, params, t=time)[i]
@@ -30,13 +30,13 @@ def eulers_method(f, pos, time, dt, *params):      #currently only works for aut
 #------------------------------------------------------------------------------        
 def rk2(f, pos, time, dt, *params):         #currently only works for autonomous systems
     """Third-order Runge-Kutta."""
-    k1 = pos #placeholder
-    k2 = pos #placeholder
+    k1 = list(pos) #placeholder
+    k2 = list(pos) #placeholder
     #Default values for parameters
     if params != ():
         params = params[0]
     else:
-        params = 1   
+        params = None  
       
     for i in range(len(pos)):      #intermediate vars
         k1[i] = dt*f(pos, params, t=time)[i]    #STEP 1
@@ -59,18 +59,18 @@ def rk2(f, pos, time, dt, *params):         #currently only works for autonomous
 #------------------------------------------------------------------------------
 #           RK4 - FOUR-STEP RUNGE KUTTA
 #------------------------------------------------------------------------------            
-def rk4(f, params, pos, time, dt):         #currently only works for autonomous systems    
+def rk4(f, pos, time, dt, *params):         #currently only works for autonomous systems    
     """Fourth-order Runge-Kutta"""
-    k1 = pos #placeholder
-    k2 = pos #placeholder
-    k3 = pos #placeholder
-    k4 = pos #placeholder
+    k1 = list(pos) #placeholder
+    k2 = list(pos) #placeholder
+    k3 = list(pos) #placeholder
+    k4 = list(pos) #placeholder
     length = len(pos)
     #Default values for parameters
     if params != ():
         params = params[0]
     else:
-        params = 1
+        params = None
     
     for i in range(length):          #STEP 1
         k1[i] = dt*f(pos, params, t=time)[i]

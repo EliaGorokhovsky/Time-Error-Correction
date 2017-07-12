@@ -8,4 +8,19 @@ import IntegrationMethods
 import Systems
 import Graphics
 
-Graphics.graph_projection(["red", "blue", "green"], ["dotted", "dashed", "solid"], [1, 2, 3], ["red", "green", "_nolabel_"], [[1,2], [1,3], [1,4]], [[1,4], [1,3], [1,2]], title="Graph", xlabel="X", ylabel="Y")
+point = [1,1,1]
+time = 0
+dt = 0.001
+function = Systems.Lorenz63
+integration = IntegrationMethods.eulers_method
+assimilation = DataAssimilation.EAKF
+timeseriesX = []
+timeseriesY = []
+timeseriesZ = []
+for i in range(int(200/dt)):
+    timeseriesX.append(point[0])
+    timeseriesY.append(point[1])
+    timeseriesZ.append(point[2])
+    point = integration(function, point, time, dt)
+    time += dt
+Graphics.graph_projection(["black"], ["solid"], [1], ["Truth"], [timeseriesX], [timeseriesY], [timeseriesZ], title="L63", xlabel="x", ylabel="y", zlabel="z")

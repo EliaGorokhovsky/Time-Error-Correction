@@ -15,7 +15,7 @@ def Lorenz63(pos, *params, **t):        #where pos is an array of length 3, and 
     #rho = 28
     #sigma = 10
     #beta = 8/3
-    if len(params[0]) >= 3:
+    if type(params[0]) is list and len(params[0]) >= 3:
         rho = params[0][0]
         sigma = params[0][1]
         beta = params[0][2]
@@ -46,7 +46,7 @@ def Lorenz84(pos, *params, **t):              #where pos is an array of length 3
     #b = 4
     #F = 8
     #G = 1.25
-    if len(params[0]) >= 4:
+    if type(params[0]) is list and len(params[0]) >= 4:
         a = params[0][0]
         b = params[0][1]
         F = params[0][2]
@@ -76,7 +76,7 @@ def Test(pos, *params, **t):
     """Simple test function to verify that various functions work consistently."""
     #default values for params:
     #a = 1
-    if len(params[0]) >= 1:
+    if type(params[0]) is list and len(params[0]) >= 1:
         a = params[0][0]
     else:
         a = 1
