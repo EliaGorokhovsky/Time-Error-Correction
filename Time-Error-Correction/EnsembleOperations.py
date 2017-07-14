@@ -2,6 +2,13 @@
 """Contains various operations on ensemble formatting."""
 
 
+
+
+def copy_ensemble_values(ensembleValues):
+    return [[ensembleValues[i][0], ensembleValues[i][1][:]] for i in range(len(ensembleValues))]
+
+
+
 def get_values_from_ensemble(ensemble, observedStatus):
     """
     Converts ensemble (array of n-dimensional points) into n arrays of values.Returns array containing arrays in form [observedStatus, [variable values]].
@@ -45,4 +52,7 @@ def get_ensemble_from_values(values):
         for point in range(len(values[var][1])):
             ensemble[point].append(values[var][1][point])
     return ensemble
+    
+
+
     
