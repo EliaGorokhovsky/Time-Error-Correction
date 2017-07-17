@@ -16,9 +16,7 @@ def get_values_from_ensemble(ensemble, observedStatus):
     observedStatus is list of booleans stating if a variable is observed (used directly in assimilation).
     Assumes length of observedStatus = length of each ensemble point.
     """
-    values = []
-    for status in observedStatus:
-        values.append([status, []])
+    values = [[status, []] for status in observedStatus]
     for i in range(len(ensemble)):
         for var in range(len(ensemble[i])):
             values[var][1].append(ensemble[i][var])

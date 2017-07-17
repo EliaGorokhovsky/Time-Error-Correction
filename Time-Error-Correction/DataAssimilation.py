@@ -54,7 +54,7 @@ def get_posterior(ensembleValues, observation, observationError):
             
             posteriorSpreads.append(math.sqrt(1/(ensembleSpreads[variable]**-2 + observationError[variable]**-2)))
             posteriorMeans.append((posteriorSpreads[-1]**2)*(ensembleMeans[variable]*ensembleSpreads[variable]**-2 + observation[variable]*observationError[variable]**-2))
-            
+               
     return posteriorSpreads, posteriorMeans
     
     
@@ -69,7 +69,8 @@ def get_state_incs(ensembleValues, observationIncrements):
     Takes ensembleValues(with observedStatus) and observation increments. Length of observationIncrements should equal that of ensembleValues.
     """
     newEnsembleValues = EnsembleOperations.copy_ensemble_values(ensembleValues)
-    stateIncrements = [[[] for j in range(len(observationIncrements))] for i in range(len(newEnsembleValues))]
+    #stateIncrements = [[[] for j in range(len(newEnsembleValues))] for i in range(len(observationIncrements))]
+    stateIncrements = [[] for i in range(len(observationIncrements))]    
     observedIndex = 0
     for observed in range(len(newEnsembleValues)):
         if newEnsembleValues[observed][0]:
@@ -79,11 +80,18 @@ def get_state_incs(ensembleValues, observationIncrements):
 #                    slope = 1
 #                else:
 #                    slope = 0
-                for point in range(len(newEnsembleValues[0][1])):  #Apply increments
-                    stateIncrement = observationIncrements[observed][point]*slope
-                    newEnsembleValues[unobserved][1][point] += stateIncrement
-                    stateIncrements[observedIndex][unobserved].append(stateIncrement)
+                stateIncrements[observedIndex].append(list(analytics.array(observationIncrements[observedIndex])*slope))
+                
+                    
+#                for point in range(len(newEnsembleValues[0][1])):  #Apply increments
+#                    stateIncrement = observationIncrements[observedIndex][point]*slope
+#                    newEnsembleValues[unobserved][1][point] += stateIncrement
+#                    stateIncrements[observedIndex][unobserved].append(stateIncrement)
+
+                        
             observedIndex += 1
+    
+    
                     
     return stateIncrements
     
@@ -119,6 +127,7 @@ def obs_incs_EAKF(ensembleValues, posteriorMeans, posteriorSpreads):
     for var in range(len(ensembleValues)):
         meanDifference = posteriorMeans[var] - ensembleMeans[var]
         spreadRatio = posteriorSpreads[var] / ensembleSpreads[var]
+
         for point in ensembleValues[var]:
             newValue = point + meanDifference
             distanceFromPosteriorMean = newValue - posteriorMeans[var]
@@ -138,11 +147,10 @@ def EAKF(ensemble, observation, observationError, observedStatus):
     Takes ensemble in standard format, observation, assumed observation error, observedStatus as array with length = number of variables. Returns ensemble.
     """
     ensembleValues = EnsembleOperations.get_values_from_ensemble(ensemble, observedStatus) #Yes
-    observedValues = EnsembleOperations.get_observed_values_from_ensemble(ensembleValues) #Yes
-    posteriorSpreads, posteriorMeans = get_posterior(observedValues, observation, observationError) 
+    observedValues = EnsembleOperations.get_observed_values_from_ensemble(ensembleValues)  #Yes
+    posteriorSpreads, posteriorMeans = get_posterior(observedValues, observation, observationError)
     observedIncrements = obs_incs_EAKF(observedValues, posteriorMeans, posteriorSpreads)
     newEnsembleValues = EnsembleOperations.copy_ensemble_values(ensembleValues)
-    get_state_incs(newEnsembleValues, observedIncrements)
     newEnsembleValues = apply_state_increments(ensembleValues, get_state_incs(ensembleValues, observedIncrements))
     newEnsemble = EnsembleOperations.get_ensemble_from_values(newEnsembleValues)
     return newEnsemble

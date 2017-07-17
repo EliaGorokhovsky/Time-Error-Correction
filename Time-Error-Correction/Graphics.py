@@ -4,7 +4,7 @@
 import matplotlib.pyplot as plot
 from mpl_toolkits.mplot3d import Axes3D
 from scipy import stats
-
+import numpy as np
 
 
 
@@ -72,16 +72,24 @@ def graph_projection(colors, lineStyles, lineWidths, labels, xLists, yLists, *zL
 
 def plot_bivariate(colors, sizes, stateIncrements, ensembleValues, xvar, yvar, observation):
     """
-    Graphs a 2-dimensional bivariate plot of observation increments.
+    Graphs a 2-dimensional bivariate plot of observation increments. Currently experimental.
     """
     
     fig = plot.figure()
     ax = fig.gca()
-    ax.scatter(ensembleValues[xvar][1], ensembleValues[yvar][1], s = sizes[0], color = colors[0])
+    slope, intercept, r_value, p_value, std_err = stats.linregress(ensembleValues[xvar][1],ensembleValues[yvar][1])    
+    print("Slope in Graph:", slope, "Slope in Assim:", stateIncrements[xvar][yvar][0]/stateIncrements[xvar][xvar][0])    
+    
     for i in range(len(ensembleValues[0][1])):
-        ax.arrow(ensembleValues[xvar][1][i], ensembleValues[yvar][1][i], stateIncrements[xvar][xvar][i], stateIncrements[xvar][yvar][i])
-        ax.arrow(ensembleValues[xvar][1][i], ensembleValues[yvar][1][i], stateIncrements[xvar][xvar][i], 0)
-        ax.arrow(ensembleValues[xvar][1][i], ensembleValues[yvar][1][i], 0, stateIncrements[xvar][yvar][i])
+        ax.arrow(ensembleValues[xvar][1][i], ensembleValues[yvar][1][i], stateIncrements[xvar][xvar][i], stateIncrements[xvar][yvar][i], linewidth=1)
+        #ax.arrow(ensembleValues[xvar][1][i], ensembleValues[yvar][1][i], stateIncrements[xvar][xvar][i], 0, linewidth=1)
+        #ax.arrow(ensembleValues[xvar][1][i], ensembleValues[yvar][1][i], 0, stateIncrements[xvar][yvar][i], linewidth=1)
+    endpoints = [[] for i in range(len(ensembleValues))]
+    for i in range(len(endpoints)):
+        endpoints[i] = [ensembleValues[i][1][j] + stateIncrements[k][i][j] for j in range(len(ensembleValues[0][1])) for k in range(len(stateIncrements))]
+    ax.plot([-40, 40], [intercept - 40*slope, intercept + 40*slope], color="red")
+    ax.scatter(endpoints[xvar], endpoints[yvar], s = 25, color = "orange")    
+    ax.scatter(ensembleValues[xvar][1], ensembleValues[yvar][1], s = sizes[0], color = colors[0])    
     ax.scatter([observation[xvar]], [observation[yvar]], s = sizes[1], color = colors[1])
         
     plot.show()
