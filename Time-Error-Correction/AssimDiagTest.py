@@ -7,8 +7,8 @@ import numpy
 from scipy import stats
 
 print("Running analysis of EAKF step")
-error = 0.01
-ensemble = [[random.gauss(1, error), random.gauss(1, error), random.gauss(1, error)] for i in range(120)]
+error = 1
+ensemble = [[random.gauss(1, error), random.gauss(1, error), random.gauss(1, error)] for i in range(1200)]
 observation = [1, 1, 1]
 
 ensembleValues = EnsembleOperations.get_values_from_ensemble(ensemble, [True, True, True])
@@ -34,7 +34,7 @@ for i in range(len(variables)):
     print(variables[i])
     print("Ensemble Gaussian: N(", round(numpy.mean(observedValues[i]), 3), ",", round(numpy.std(observedValues[i]), 3), ")")
     
-posteriorSpread, posteriorMean = DataAssimilation.get_posterior(observedValues, observation, [error, error, error])
+posteriorSpread, posteriorMean = DataAssimilation.get_posterior(observedValues, observation, [0.5, 0.5, 0.5])
 
 
 print("---------------\nget_posterior\n---------------")
