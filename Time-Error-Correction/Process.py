@@ -3,6 +3,7 @@
 import Systems
 import IntegrationMethods
 import DataAssimilation
+import MiscFunctions
 
 class Process:
     """
@@ -16,8 +17,10 @@ class Process:
         self.truthsList = []            #Stores true values. truthsList[i] corresponds to timeList[i].
         self.obsList = []               #Stores observations. obsList[i] corresponds to timeList[i/(dt*obsInterval)]
         self.ensembleList = []          #Stores ensembles. ensembleList[i] corresponds to timeList[i].
-  
-
+        self.obsTimeList = []           #Stores times at which observations are taken.      
+        
+        
+        self.dt = 0                     #The timestep for truth.              
 
 
       
@@ -48,25 +51,50 @@ class Process:
             else:
                 raise ValueError(kwargs["assimilation"], "is not a valid assimilation method for testing.")
         else:
-            self.system = DataAssimilation.EAKF
+            self.assimilation = DataAssimilation.EAKF
         
         if "params" in kwargs:
             self.systemParameters = kwargs["params"]
         else: 
             self.systemParameters = None
-            
+
+    
+
+        
     
     def get_truth(self, startTime, endTime, dt, startPosition):
+        """
+        Gets the true values and times for each time between startTime and endTime, inclusive, with an interval of dt.        
+        """
+        self.dt = dt
         pos = list(startPosition)
         time = 0
         intervalLength = endTime - startTime
-        steps = int(intervalLength / dt)
+        steps = int(intervalLength / self.dt)
         for step in range(steps + 1):
             self.truthsList.append(list(pos))
-            pos = self.integrationMethod(self.system, pos, time, dt)
+            pos = self.integrationMethod(self.system, pos, time, self.dt)
             self.timeList.append(time)
-            time += dt
+            time += self.dt
         return self.truthsList, self.timeList
+        
+        
+        
+        
+        
+    def get_observations(self, observationInterval, error):
+        """
+        Generates observations every observationInterval with specified error (Gaussian stdev) in variablenum directions.
+        """
+        observationCount = MiscFunctions.mod(self.timeList[-1] - self.timeList[0], observationInterval)[0]
+        self.obsList = [MiscFunctions.perturb_point(self.truthsList[int(observation * observationInterval / self.dt)], error) for observation in range(observationCount)]
+        self.obsTimeList = [observation * observationInterval for observation in range(observationCount)]
+        return self.obsList, self.obsTimeList
+            
+            
+            
+    
+    
         
                 
         

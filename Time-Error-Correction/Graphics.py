@@ -21,7 +21,10 @@ def graph_projection(colors, lineStyles, lineWidths, labels, xLists, yLists, *zL
         fig = plot.figure()
         ax = fig.gca(projection = '3d')
         for dataset in range(len(colors)):
-            ax.plot(xLists[dataset], yLists[dataset], zs=zLists[dataset], color=colors[dataset], linestyle=lineStyles[dataset], linewidth=lineWidths[dataset], label=labels[dataset])
+            if lineStyles[dataset] == "scatter":
+                ax.scatter(xLists[dataset], yLists[dataset], zs=zLists[dataset], color=colors[dataset], label=labels[dataset], s=lineWidths[dataset])
+            else:
+                ax.plot(xLists[dataset], yLists[dataset], zs=zLists[dataset], color=colors[dataset], linestyle=lineStyles[dataset], linewidth=lineWidths[dataset], label=labels[dataset])
         legend = ax.legend(loc='upper right', shadow=True)
         frame = legend.get_frame()
         frame.set_facecolor('0.90')
@@ -47,7 +50,10 @@ def graph_projection(colors, lineStyles, lineWidths, labels, xLists, yLists, *zL
         fig = plot.figure()
         ax = fig.gca()
         for dataset in range(len(colors)):
-            ax.plot(xLists[dataset], yLists[dataset], color=colors[dataset], linestyle=lineStyles[dataset], linewidth=lineWidths[dataset], label=labels[dataset])
+            if lineStyles[dataset] == "scatter":
+                ax.scatter(xLists[dataset], yLists[dataset], color=colors[dataset], label=labels[dataset], s=lineWidths[dataset])
+            else:
+                ax.plot(xLists[dataset], yLists[dataset], color=colors[dataset], linestyle=lineStyles[dataset], linewidth=lineWidths[dataset], label=labels[dataset])
         legend = ax.legend(loc='upper right', shadow=True)
         frame = legend.get_frame()
         frame.set_facecolor('0.90')
