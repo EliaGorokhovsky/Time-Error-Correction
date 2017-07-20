@@ -11,7 +11,6 @@ import EnsembleOperations
 
 
 
-
 def get_posterior(ensembleValues, observation, observationError):
     """
     Assuming normality, uses Bayes' Rule to find the posterior distribution from an ensemble/prior and an observation distribution.
@@ -72,7 +71,7 @@ def get_state_inc(ensembleValues, observationIncrements, index):
     stateIncrements = []
     for unobserved in range(len(ensembleValues)):
         slope, intercept, r_value, p_value, std_err = stats.linregress(ensembleValues[index][1],ensembleValues[unobserved][1])
-        stateIncrements.append(list(analytics.array(observationIncrements)*slope))
+        stateIncrements.append(list(analytics.array(observationIncrements)*slope))  #Multiplies all observation increments by slope.
     return stateIncrements
   
 
@@ -127,13 +126,13 @@ def EAKF(ensemble, observation, observationError, observedStatus):
     posteriorSpreads, posteriorMeans = get_posterior(observedValues, observation, observationError)
     for i in range(len(ensembleValues)):
         ensembleValues = apply_state_inc(ensembleValues, get_state_inc(ensembleValues,obs_inc_EAKF(ensembleValues[i][1], posteriorMeans[i], posteriorSpreads[i]) ,i))
-    #observedIncrements = obs_incs_EAKF(observedValues, posteriorMeans, posteriorSpreads)
-    #newEnsembleValues = EnsembleOperations.copy_ensemble_values(ensembleValues)
-    #newEnsembleValues = apply_state_increments(ensembleValues, get_state_incs(ensembleValues, observedIncrements)[0])
     ensemble = EnsembleOperations.get_ensemble_from_values(ensembleValues)
     return ensemble
                 
             
             
+#-------------------------------------------------------------------------------
+#           NO NEW METHODS BEYOND THIS POINT!
+#-------------------------------------------------------------------------------    
     
-    
+methodsHash = {"EAKF" : EAKF}        #Stores all the assimilation methods as strings. 

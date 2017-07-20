@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""A collection of functions to approximately solve differential equations."""
-
+"""A collection of functions to approximately solve differential equations."""       
 
 #------------------------------------------------------------------------------
 #           EULER'S METHOD - ONE STEP
@@ -97,4 +96,8 @@ def rk4(f, pos, time, dt, *params):         #currently only works for autonomous
         pos[i] += (k1[i]/6) + (k2[i]/3) + (k3[i]/3) + (k4[i]/6)
     return pos
     
+#-------------------------------------------------------------------------------
+#           NO NEW METHODS BEYOND THIS POINT!
+#-------------------------------------------------------------------------------
     
+methodsHash = {"Euler's Method" : eulers_method, "RK2" : rk2, "RK4" : rk4}        #Stores all the integration methods as strings. 

@@ -88,3 +88,10 @@ def Test(pos, *params, **t):
     v[2] = a
     
     return v     #returns instantaneous rate of change
+
+
+#-------------------------------------------------------------------------------
+#           NO NEW SYSTEMS BEYOND THIS POINT!
+#-------------------------------------------------------------------------------
+
+methodsHash = {"L63" : Lorenz63, "L84" : Lorenz84, "Test" : Test}        #Stores all the systems as strings. 
