@@ -8,6 +8,9 @@ def copy_ensemble_values(ensembleValues):
     return [[ensembleValues[i][0], ensembleValues[i][1][:]] for i in range(len(ensembleValues))]
 
 
+def copy_ensemble(ensemble):
+    return [list(ensemble[point]) for point in range(len(ensemble))]
+
 
 def get_values_from_ensemble(ensemble, observedStatus):
     """

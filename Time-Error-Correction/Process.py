@@ -4,6 +4,7 @@ import Systems
 import IntegrationMethods
 import DataAssimilation
 import MiscFunctions
+import EnsembleOperations
 
 class Process:
     """
@@ -18,7 +19,7 @@ class Process:
         self.obsList = []               #Stores observations. obsList[i] corresponds to timeList[i/(dt*obsInterval)]
         self.ensembleList = []          #Stores ensembles. ensembleList[i] corresponds to timeList[i].
         self.obsTimeList = []           #Stores times at which observations are taken.      
-        
+        self.ensembleTimeList = []      #Stores times for ensemble list.        
         
         self.dt = 0                     #The timestep for truth.              
 
@@ -73,8 +74,8 @@ class Process:
         steps = int(intervalLength / self.dt)
         for step in range(steps + 1):
             self.truthsList.append(list(pos))
-            pos = self.integrationMethod(self.system, pos, time, self.dt)
             self.timeList.append(time)
+            pos = self.integrationMethod(self.system, pos, time, self.dt)
             time += self.dt
         return self.truthsList, self.timeList
         
@@ -88,8 +89,32 @@ class Process:
         """
         observationCount = MiscFunctions.mod(self.timeList[-1] - self.timeList[0], observationInterval)[0]
         self.obsList = [MiscFunctions.perturb_point(self.truthsList[int(observation * observationInterval / self.dt)], error) for observation in range(observationCount)]
-        self.obsTimeList = [observation * observationInterval for observation in range(observationCount)]
+        self.obsTimeList = [float(observation * observationInterval) for observation in range(observationCount)]
         return self.obsList, self.obsTimeList
+        
+        
+        
+        
+    def run_ensemble(self, startTime, endTime, dt, ensembleSize, reportedError, ensembleSpread, startPoint, observedStatus):
+        """
+        Integrates ensemble points through model, performing assimilation.
+        """        
+        self.ensembledt = dt
+        ensemble = [MiscFunctions.perturb_point(startPoint, ensembleSpread) for i in range(ensembleSize)]
+        time = 0
+        intervalLength = endTime - startTime
+        steps = int(intervalLength / self.ensembledt)
+        for step in range(steps + 1):
+            if round(time, 5) in self.obsTimeList:
+                ensemble = self.assimilationMethod(ensemble, self.obsList[self.obsTimeList.index(round(time, 5))], reportedError, observedStatus)
+            self.ensembleList.append(EnsembleOperations.copy_ensemble(ensemble))
+            self.ensembleTimeList.append(time)
+            ensemble = [self.integrationMethod(self.system, point, time, self.ensembledt) for point in ensemble]
+            time += self.ensembledt
+        return self.ensembleList, self.ensembleTimeList            
+            
+            
+            
             
             
             

@@ -25,4 +25,4 @@ def perturb_point(point, error):
     """
     Generates a perturbed point given error for each variable. Used for ensemble generation and observations.
     """
-    return [point[var] + random.gauss(point[var], error[var]) for var in range(len(point))]
+    return [random.gauss(point[var], error[var]) for var in range(len(point))]
