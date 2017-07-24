@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """Operates the experimental process."""
+import AnalysisOperations
 import Systems
 import IntegrationMethods
 import DataAssimilation
 import MiscFunctions
 import EnsembleOperations
+import numpy as np
 
 class Process:
     """
@@ -18,6 +20,7 @@ class Process:
         self.truthsList = []            #Stores true values. truthsList[i] corresponds to timeList[i].
         self.obsList = []               #Stores observations. obsList[i] corresponds to timeList[i/(dt*obsInterval)]
         self.ensembleList = []          #Stores ensembles. ensembleList[i] corresponds to timeList[i].
+        self.ensembleMeansList = []     #Stores ensemble means.        
         self.obsTimeList = []           #Stores times at which observations are taken.      
         self.ensembleTimeList = []      #Stores times for ensemble list.        
         
@@ -111,8 +114,18 @@ class Process:
             self.ensembleTimeList.append(time)
             ensemble = [self.integrationMethod(self.system, point, time, self.ensembledt) for point in ensemble]
             time += self.ensembledt
-        return self.ensembleList, self.ensembleTimeList            
-            
+        return self.ensembleList, self.ensembleTimeList
+
+
+
+
+
+    def get_ensemble_means(self):
+        """
+        Returns lists of variable means with length equal to number of timesteps.
+        """            
+        self.ensembleMeansList = [[np.mean(AnalysisOperations.get_var_lists_from_points(self.ensembleList[step])[var]) for var in range(len(self.ensembleList[step]))] for step in range(len(self.ensembleList))]
+        return self.ensembleMeansList      
             
             
             
