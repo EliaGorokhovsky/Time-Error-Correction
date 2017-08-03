@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """Contains various operations on ensemble formatting."""
 
-
+import numpy as np
+import AnalysisOperations
 
 
 def copy_ensemble_values(ensembleValues):
@@ -56,4 +57,17 @@ def get_ensemble_from_values(values):
     
 
 
+
+
+
+def inflate(ensemble, inflateScalars):
+    """
+    Inflates ensemble multiplicatively by scalar values.    
+    """
+    ensembleValues = AnalysisOperations.get_var_lists_from_points(ensemble)
+    newEnsembleValues = [[inflateScalars[var]*(i - np.mean(ensembleValues[var])) + np.mean(ensembleValues[var]) for i in ensembleValues[var]] for var in range(len(ensembleValues))]
+    return AnalysisOperations.get_points_from_var_lists(newEnsembleValues)
     
+    
+    
+

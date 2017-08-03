@@ -7,12 +7,13 @@ import DataAssimilation
 import MiscFunctions
 import EnsembleOperations
 import numpy as np
+import ExperimentalThings
 
 class Process:
     """
     Runs a single test; contains all variables that must be remembered.
     """
-    def __init__(self):
+    def __init__(self, assimilation):
         """
         Initializes storage methods, etc.
         """
@@ -25,7 +26,7 @@ class Process:
         self.ensembleTimeList = []      #Stores times for ensemble list.        
         
         self.dt = 0                     #The timestep for truth.              
-
+        self.experimentalStatus = assimilation
 
       
     def choose_methods(self, **kwargs):
@@ -86,19 +87,21 @@ class Process:
         
         
         
-    def get_observations(self, observationInterval, error):
+    def get_observations(self, observationInterval, error, errorType):
         """
         Generates observations every observationInterval with specified error (Gaussian stdev) in variablenum directions.
         """
+        self.errorType = errorType
         observationCount = MiscFunctions.mod(self.timeList[-1] - self.timeList[0], observationInterval)[0]
-        self.obsList = [MiscFunctions.perturb_point(self.truthsList[int(observation * observationInterval / self.dt)], error) for observation in range(observationCount)]
+        #self.obsList = [MiscFunctions.perturb_point(self.truthsList[int(observation * observationInterval / self.dt)], error) for observation in range(observationCount)]
+        self.obsList = [MiscFunctions.generate_typed_error(self.truthsList[int(observation * observationInterval / self.dt)], error, self.errorType, self.dt, self.system, self.integrationMethod, self.systemParameters) for observation in range(observationCount)]
         self.obsTimeList = [float(observation * observationInterval) for observation in range(observationCount)]
         return self.obsList, self.obsTimeList
         
         
         
         
-    def run_ensemble(self, startTime, endTime, dt, ensembleSize, reportedError, ensembleSpread, startPoint, observedStatus):
+    def run_ensemble(self, startTime, endTime, dt, ensembleSize, reportedError, ensembleSpread, startPoint, observedStatus, inflateScalars):
         """
         Integrates ensemble points through model, performing assimilation.
         """        
@@ -109,7 +112,13 @@ class Process:
         steps = int(intervalLength / self.ensembledt)
         for step in range(steps + 1):
             if round(time, 5) in self.obsTimeList:
-                ensemble = self.assimilationMethod(ensemble, self.obsList[self.obsTimeList.index(round(time, 5))], reportedError, observedStatus)
+                ensemble = EnsembleOperations.inflate(ensemble, inflateScalars)
+                if self.experimentalStatus:
+                    observation, observationLikelihood = ExperimentalThings.get_adaptive_likelihood(self.obsList[self.obsTimeList.index(round(time, 5))], reportedError, self.errorType, self.dt, self.system, self.integrationMethod, self.systemParameters)
+                    ensemble = self.assimilationMethod(ensemble, observation, observationLikelihood, observedStatus)
+                else:
+                    ensemble = self.assimilationMethod(ensemble, self.obsList[self.obsTimeList.index(round(time, 5))], np.array(reportedError)*5, observedStatus)
+                
             self.ensembleList.append(EnsembleOperations.copy_ensemble(ensemble))
             self.ensembleTimeList.append(time)
             ensemble = [self.integrationMethod(self.system, point, time, self.ensembledt) for point in ensemble]
@@ -123,8 +132,8 @@ class Process:
     def get_ensemble_means(self):
         """
         Returns lists of variable means with length equal to number of timesteps.
-        """            
-        self.ensembleMeansList = [[np.mean(AnalysisOperations.get_var_lists_from_points(self.ensembleList[step])[var]) for var in range(len(self.ensembleList[step]))] for step in range(len(self.ensembleList))]
+        """           
+        self.ensembleMeansList = [[np.mean(AnalysisOperations.get_var_lists_from_points(self.ensembleList[step])[var]) for var in range(len(AnalysisOperations.get_var_lists_from_points(self.ensembleList[step])))] for step in range(len(self.ensembleList))]
         return self.ensembleMeansList      
             
             
