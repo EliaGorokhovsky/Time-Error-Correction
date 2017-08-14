@@ -133,7 +133,26 @@ def kernel_density_estimation(points, colors, bandwidths, lineWidths, lineStyles
     if "ylim" in kwargs:
         ax.set_ylim(kwargs["ylim"][0], kwargs["ylim"][1])
     if "zlim" in kwargs:
-        ax.set_zlim(kwargs["zlim"][0], kwargs["zlim"][1])           
+        ax.set_zlim(kwargs["zlim"][0], kwargs["zlim"][1])    
+        
+        
+
+
+def normal_rhf(ensembleValues, likelihood, observation, newEnsemble):
+    baseValues = [i*0.01 for i in range((math.floor(min(ensembleValues))-5)*100, (math.ceil(max(ensembleValues))+5)*100)]
+    likeDistribution = mlab.normpdf(np.array(baseValues), observation, np.array(likelihood))
+    likeEnsemble = mlab.normpdf(np.array(ensembleValues), observation, np.array(likelihood))
+    likeNewEnsemble = mlab.normpdf(np.array(newEnsemble), observation, np.array(likelihood))
+    priorDist = mlab.normpdf(np.array(baseValues), np.mean(ensembleValues), np.std(ensembleValues))
+    postDist = mlab.normpdf(np.array(baseValues), np.mean(newEnsemble), np.std(newEnsemble))
+
+    fig = plot.figure()
+    ax = fig.gca()
+    ax.plot(baseValues, likeDistribution, color="red")
+    ax.plot(baseValues, priorDist, color="green")
+    ax.plot(baseValues, postDist, color="blue")
+    #ax.scatter(ensembleValues, likeEnsemble, color="green")
+    #ax.scatter(newEnsemble, likeNewEnsemble, color="blue")
         
         
     

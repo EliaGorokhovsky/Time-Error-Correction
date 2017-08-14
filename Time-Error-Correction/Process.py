@@ -94,8 +94,8 @@ class Process:
         self.errorType = errorType
         observationCount = MiscFunctions.mod(self.timeList[-1] - self.timeList[0], observationInterval)[0]
         #self.obsList = [MiscFunctions.perturb_point(self.truthsList[int(observation * observationInterval / self.dt)], error) for observation in range(observationCount)]
-        self.obsList = [MiscFunctions.generate_typed_error(self.truthsList[int(observation * observationInterval / self.dt)], error, self.errorType, self.dt, self.system, self.integrationMethod, self.systemParameters) for observation in range(observationCount)]
-        self.obsTimeList = [float(observation * observationInterval) for observation in range(observationCount)]
+        self.obsList = [MiscFunctions.generate_typed_error(self.truthsList[int(observation * observationInterval / self.dt)], error, self.errorType, self.dt, self.system, self.integrationMethod, self.systemParameters) for observation in range(observationCount+1)]
+        self.obsTimeList = [round(float(observation * observationInterval), 5) for observation in range(observationCount+1)]
         return self.obsList, self.obsTimeList
         
         
@@ -111,14 +111,19 @@ class Process:
         intervalLength = endTime - startTime
         steps = int(intervalLength / self.ensembledt)
         for step in range(steps + 1):
-            if round(time, 5) in self.obsTimeList:
+            if round(time, 5) in self.obsTimeList and time != 0:
                 ensemble = EnsembleOperations.inflate(ensemble, inflateScalars)
+                #previousEnsemble = AnalysisOperations.get_var_lists_from_points(EnsembleOperations.copy_ensemble(ensemble))
                 if self.experimentalStatus:
                     observation, observationLikelihood = ExperimentalThings.get_adaptive_likelihood(self.obsList[self.obsTimeList.index(round(time, 5))], reportedError, self.errorType, self.dt, self.system, self.integrationMethod, self.systemParameters)
                     ensemble = self.assimilationMethod(ensemble, observation, observationLikelihood, observedStatus)
                 else:
-                    ensemble = self.assimilationMethod(ensemble, self.obsList[self.obsTimeList.index(round(time, 5))], np.array(reportedError)*5, observedStatus)
-                
+                    ensemble = self.assimilationMethod(ensemble, self.obsList[self.obsTimeList.index(round(time, 5))], np.array(reportedError), observedStatus)
+                #ensembleValues = AnalysisOperations.get_var_lists_from_points(ensemble)
+                #print("Assimilated X from N("+str(np.mean(previousEnsemble[0]))+"|"+str(np.std(previousEnsemble[0]))+") to N(" + str(np.mean(ensembleValues[0]))+"|"+str(np.std(ensembleValues[0]))+") using observation N(" + str(self.obsList[self.obsTimeList.index(round(time, 5))][0])+"|"+str(reportedError[0])+") at time", time)
+                #print("Assimilated Y from N("+str(np.mean(previousEnsemble[1]))+"|"+str(np.std(previousEnsemble[1]))+") to N(" + str(np.mean(ensembleValues[1]))+"|"+str(np.std(ensembleValues[1]))+") using observation " + str(self.obsList[self.obsTimeList.index(round(time, 5))][1]))
+                #print("Assimilated Z from N("+str(np.mean(previousEnsemble[2]))+"|"+str(np.std(previousEnsemble[2]))+") to N(" + str(np.mean(ensembleValues[2]))+"|"+str(np.std(ensembleValues[2]))+") using observation " + str(self.obsList[self.obsTimeList.index(round(time, 5))][2]))
+                #print("Assimilated from", previousEnsemble, "to", ensembleValues, "using observation", self.obsList[self.obsTimeList.index(round(time, 5))])
             self.ensembleList.append(EnsembleOperations.copy_ensemble(ensemble))
             self.ensembleTimeList.append(time)
             ensemble = [self.integrationMethod(self.system, point, time, self.ensembledt) for point in ensemble]

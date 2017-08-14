@@ -9,6 +9,7 @@ import EnsembleOperations
 import random 
 import MiscFunctions
 import matplotlib.mlab as mlab
+import Graphics
 
 
 
@@ -74,6 +75,11 @@ def get_state_inc(ensembleValues, observationIncrements, index):
     stateIncrements = []
     for unobserved in range(len(ensembleValues)):
         slope, intercept, r_value, p_value, std_err = stats.linregress(ensembleValues[index][1],ensembleValues[unobserved][1])
+        #THIS CODE OVERRIDES THE REGRESSION.
+        if index == unobserved:
+            slope = 1
+        else:
+            slope = 0
         stateIncrements.append(list(np.array(observationIncrements)*slope))  #Multiplies all observation increments by slope.
     return stateIncrements
   
@@ -124,19 +130,21 @@ def obs_inc_EnKF(ensembleValues, observation, observationError, posteriorMean, p
     Takes one list of values i.e. ensembleValues[i], observation in one variable, and information about posterior.
     Returns list of observation increments.
     """
-    #Priors
-    ensembleSpread = np.std(ensembleValues)    
-    #Generate perturbed observations
-    perturbedObservations = [random.gauss(observation, observationError) for i in ensembleValues]
-    #Adjust perturbed obs to observation mean.    
-    newPerturbedObservations = [i - np.mean(perturbedObservations) + observation for i in perturbedObservations]
-    newEnsemble = [posteriorSpread * (ensembleValues[i]/ensembleSpread + newPerturbedObservations[i]/observationError) for i in range(len(ensembleValues))]
+#    #Priors
+#    ensembleSpread = np.std(ensembleValues)    
+#    #Generate perturbed observations
+#    perturbedObservations = [random.gauss(observation, observationError) for i in ensembleValues]
+#    #Adjust perturbed obs to observation mean.    
+#    newPerturbedObservations = [i - np.mean(perturbedObservations) + observation for i in perturbedObservations]
+#    newEnsemble = [posteriorSpread * (ensembleValues[i]/ensembleSpread + newPerturbedObservations[i]/observationError) for i in range(len(ensembleValues))]
+    #THE FOLLOWING CODE IS EXPERIMENTAL
+    newEnsemble = [random.gauss(posteriorMean, posteriorSpread) for i in range(len(ensembleValues))]
     return [newEnsemble[i] - ensembleValues[i] for i in range(len(newEnsemble))]
 
 
 
 
-def obs_inc_rank_histogram(ensembleValues, observation, observationLikelihood, rectangularQuadrature):
+def obs_inc_rank_histogram(ensembleValues, observationLikelihood, rectangularQuadrature):
     """
     Calculates observation increments for one variable using the RHF on ensemble.
     
@@ -147,7 +155,10 @@ def obs_inc_rank_histogram(ensembleValues, observation, observationLikelihood, r
     ensembleSpread = np.std(ensembleValues)
     ensembleLength = len(ensembleValues)
     sortedEnsemble, indices = MiscFunctions.sort_indices(ensembleValues)
+    newObservationLikelihood = [observationLikelihood[indices[i]] for i in range(ensembleLength)]
+    observationLikelihood = newObservationLikelihood[:]
     likelihoodDensity = [(observationLikelihood[i+1] + observationLikelihood[i])/2 for i in range(len(observationLikelihood)-1)]
+    #print(ensembleLength, max(ensembleValues))
     
     #Compute partial Gaussian kernels for tails of prior.    
     distanceForUnitSpread = -1 * MiscFunctions.weighted_norm_inverse(1, 0, 1, 1/(ensembleLength + 1))
@@ -180,23 +191,20 @@ def obs_inc_rank_histogram(ensembleValues, observation, observationLikelihood, r
     #lowestBox = 0          #Updated so we don't have to search boxes we've already passed.     
  
     newEnsemble = []
-    
     for i in range(ensembleLength):
         passedMass = (i+1)/(ensembleLength + 1)         #The amount of mass before each ensemble member.
-        
         if passedMass < cumulativeMass[1]:          #If it's in the left tail
-            print("Passed Mass in tail left")
             newEnsemble.append(MiscFunctions.weighted_norm_inverse(leftAmp, leftMean, leftStandardDeviation, passedMass))
         elif passedMass > cumulativeMass[-2]:       #If it's in the right tail
-            print("Passed Mass in tail right")
-            newEnsemble.append(MiscFunctions.weighted_norm_inverse(rightAmp, rightMean, rightStandardDeviation, passedMass))
+            newEnsemble.append(MiscFunctions.weighted_norm_inverse(rightAmp, rightMean, rightStandardDeviation, 1-passedMass))
+            newEnsemble[-1] = 2*rightMean - newEnsemble[-1]
         else:                                       #If it's in one of the uniform boxes in the middle.
             for cumulativeMassIndex in range(2, len(cumulativeMass)):  #Ignore mass after last ensemble point.
-                if passedMass >= cumulativeMass[cumulativeMassIndex - 1] and passedMass <= cumulativeMass[cumulativeMassIndex + 1]:     #If the mass is greater than the total mass up to a point but less than the total mass after a point: 
+                if passedMass >= cumulativeMass[cumulativeMassIndex - 1] and passedMass <= cumulativeMass[cumulativeMassIndex]:     #If the mass is greater than the total mass up to a point but less than the total mass after a point: 
                 
                     if rectangularQuadrature:
                         ensemblePointIndex = cumulativeMassIndex - 2    #The index of the ensemble point to the left of the area and also of the height of the bin.
-                        newEnsemble.append(sortedEnsemble[ensemblePointIndex] + (passedMass-cumulativeMass[cumulativeMassIndex])/(cumulativeMass[cumulativeMassIndex+1] - cumulativeMass[cumulativeMassIndex])*(sortedEnsemble[ensemblePointIndex+1] - sortedEnsemble[ensemblePointIndex]))
+                        newEnsemble.append(sortedEnsemble[ensemblePointIndex] + (passedMass-cumulativeMass[cumulativeMassIndex-1])/(cumulativeMass[cumulativeMassIndex] - cumulativeMass[cumulativeMassIndex-1])*(sortedEnsemble[ensemblePointIndex+1] - sortedEnsemble[ensemblePointIndex]))
                     else:
                         #We're using trapezoidal quadrature to get the new point. 
                         #box is index of cumulative mass, box - 1 is ensemble point
@@ -218,13 +226,10 @@ def obs_inc_rank_histogram(ensembleValues, observation, observationLikelihood, r
                             raise ValueError("Rank Histogram Filter was unable to get a satisfactory root for trapezoidal interpolation.")
                     
     observationIncrements = []
-    #Get increments
-    for i in range(ensembleLength):
-        if i >= len(indices) or i >= len(newEnsemble) or indices[i] >= len(ensembleValues):
-            print(ensembleLength, len(indices), len(newEnsemble), i, indices[i], len(ensembleValues))
-            print(newEnsemble[i])
-            print(ensembleValues[indices[i]])
-        observationIncrements.append(newEnsemble[i] - ensembleValues[indices[i]])
+    sortedObservationIncrements = [newEnsemble[i] - ensembleValues[indices[i]] for i in range(ensembleLength)]
+    observationIncrements = [None for i in range(len(indices))]
+    for i in range(len(indices)):
+        observationIncrements[indices[i]] = sortedObservationIncrements[i]  
     return observationIncrements
     
                         
@@ -272,12 +277,15 @@ def RHF(ensemble, observation, observationLikelihood, observedStatus):
     
     Takes ensemble in standard format, observation, observationLikelihood as a list of either a standard deviation of a normal or an array of likelihood values with same length as ensemble, and observedStatus. Returns ensemble.
     """
+    #print("Starting Assim Step")
     ensembleValues = EnsembleOperations.get_values_from_ensemble(ensemble, observedStatus)
+    oldEnsembleValues = EnsembleOperations.copy_ensemble_values(ensembleValues)
     observedValues = EnsembleOperations.get_observed_values_from_ensemble(ensembleValues)
-    if type(observationLikelihood[0]) is int or type(observationLikelihood[0]) is float or type(observationLikelihood[0]) is np.float64:
+    if type(observationLikelihood[0]) is not np.ndarray:
+        oldObservationLikelihood = observationLikelihood[:]
         observationLikelihood = [mlab.normpdf(np.array(observedValues[i]), observation[i], observationLikelihood[i]) for i in range(len(observedValues))]
     for i in range(len(observedValues)):
-        ensembleValues = apply_state_inc(ensembleValues, get_state_inc(ensembleValues, obs_inc_rank_histogram(observedValues[i], observation[i], observationLikelihood[i], True), i))
+        ensembleValues = apply_state_inc(ensembleValues, get_state_inc(ensembleValues, obs_inc_rank_histogram(observedValues[i], observationLikelihood[i], True), i))
     ensemble = EnsembleOperations.get_ensemble_from_values(ensembleValues)
     return ensemble
 

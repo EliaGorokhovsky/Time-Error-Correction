@@ -4,6 +4,7 @@
 
 import math
 import random
+from scipy.stats import norm
 
 
 
@@ -117,7 +118,8 @@ def weighted_norm_inverse(alpha, mean, standardDeviation, p):
     np = p / alpha
     x = norm_inverse(np)
     x = mean + x * standardDeviation
-    return x
+    #return x
+    return norm.ppf(p/alpha, loc=mean, scale=standardDeviation)
   
 
 
@@ -129,8 +131,7 @@ def solve_quadratic(a, b, c):
     """
     return (-b + math.sqrt(b**2 - 4*a*c))/(2*a), (-b - math.sqrt(b**2 - 4*a*c))/(2*a)
     
-    
-    
+       
     
     
 def sort_indices(aList):
