@@ -288,10 +288,8 @@ def RHF(ensemble, observation, observationLikelihood, observedStatus):
     """
     #print("Starting Assim Step")
     ensembleValues = EnsembleOperations.get_values_from_ensemble(ensemble, observedStatus)
-    oldEnsembleValues = EnsembleOperations.copy_ensemble_values(ensembleValues)
     observedValues = EnsembleOperations.get_observed_values_from_ensemble(ensembleValues)
     if type(observationLikelihood[0]) is not np.ndarray:
-        oldObservationLikelihood = observationLikelihood[:]
         observationLikelihood = [mlab.normpdf(np.array(observedValues[i]), observation[i], observationLikelihood[i]) for i in range(len(observedValues))]
     for i in range(len(observedValues)):
         ensembleValues = apply_state_inc(ensembleValues, get_state_inc(ensembleValues, obs_inc_rank_histogram(observedValues[i], observationLikelihood[i], True), i))
