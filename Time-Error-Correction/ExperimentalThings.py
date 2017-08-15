@@ -30,9 +30,9 @@ def get_adaptive_likelihood(point, error, errorType, dt, system, integration, *p
 #    Graphics.rank_histogram([sortedVarList1[50*i] for i in range(math.ceil(len(sortedVarList1)/50))], "orange", 1, title="Rank Histogram for Simulated Observations in Y")
 #    Graphics.rank_histogram([sortedVarList2[50*i] for i in range(math.ceil(len(sortedVarList2)/50))], "orange", 1, title="Rank Histogram for Simulated Observations in Z")
 #    Graphics.rank_histogram([sortedVarList3[50*i] for i in range(math.ceil(len(sortedVarList3)/50))], "orange", 1, title="Rank Histogram for Simulated Observations in Time")
-    Graphics.kernel_density_estimation(sortedVarList0, ["red"], [0.15], [1], ["solid"], ["_nolegend_"], title="Probability Distribution for X at time" + str(point[3]))    
-    Graphics.kernel_density_estimation(sortedVarList1, ["red"], [0.3], [1], ["solid"], ["_nolegend_"], title="Probability Distribution for Y at time" + str(point[3]))    
-    Graphics.kernel_density_estimation(sortedVarList2, ["red"], [0.15], [1], ["solid"], ["_nolegend_"], title="Probability Distribution for Z at time" + str(point[3]))    
-    Graphics.kernel_density_estimation(sortedVarList3, ["red"], [0.01], [1], ["solid"], ["_nolegend_"], title="Probability Distribution for T at time" + str(point[3]))                    
-    return [np.mean(l) for l in varLists], [np.std(l) for l in varLists]
+    #Graphics.kernel_density_estimation(sortedVarList0, ["red"], [0.15], [1], ["solid"], ["_nolegend_"], title="Probability Distribution for X at time" + str(point[3]))    
+    #Graphics.kernel_density_estimation(sortedVarList1, ["red"], [0.3], [1], ["solid"], ["_nolegend_"], title="Probability Distribution for Y at time" + str(point[3]))    
+    #Graphics.kernel_density_estimation(sortedVarList2, ["red"], [0.15], [1], ["solid"], ["_nolegend_"], title="Probability Distribution for Z at time" + str(point[3]))    
+    #Graphics.kernel_density_estimation(sortedVarList3, ["red"], [0.01], [1], ["solid"], ["_nolegend_"], title="Probability Distribution for T at time" + str(point[3]))                    
+    return [np.mean(l) for l in varLists], [np.std(l, ddof=1) for l in varLists]
 

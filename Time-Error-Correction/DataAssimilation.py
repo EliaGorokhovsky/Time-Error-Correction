@@ -26,7 +26,7 @@ def get_posterior(ensembleValues, observation, observationError):
     
     #Priors    
     ensembleMeans = [np.mean(valueList) for valueList in ensembleValues]
-    ensembleSpreads = [np.std(valueList) for valueList in ensembleValues]
+    ensembleSpreads = [np.std(valueList, ddof=1) for valueList in ensembleValues]
     
     #Compute Posterior 
     posteriorMeans = []
@@ -109,7 +109,7 @@ def obs_inc_EAKF(ensembleValues, posteriorMean, posteriorSpread):
     """
     #Priors        
     ensembleMean = np.mean(ensembleValues)
-    ensembleSpread = np.std(ensembleValues)
+    ensembleSpread = np.std(ensembleValues, ddof=1)
     observedIncrements = []
     meanDifference = posteriorMean - ensembleMean
     spreadRatio = posteriorSpread / ensembleSpread
@@ -131,7 +131,7 @@ def obs_inc_EnKF(ensembleValues, observation, observationError, posteriorMean, p
     Returns list of observation increments.
     """
 #    #Priors
-#    ensembleSpread = np.std(ensembleValues)    
+#    ensembleSpread = np.std(ensembleValues, ddof=1)    
 #    #Generate perturbed observations
 #    perturbedObservations = [random.gauss(observation, observationError) for i in ensembleValues]
 #    #Adjust perturbed obs to observation mean.    
@@ -152,7 +152,7 @@ def obs_inc_rank_histogram(ensembleValues, observationLikelihood, rectangularQua
     Returns list of observation ecrements of equal length to ensembleValues.
     """
     #Priors
-    ensembleSpread = np.std(ensembleValues)
+    ensembleSpread = np.std(ensembleValues, ddof=1)
     ensembleLength = len(ensembleValues)
     sortedEnsemble, indices = MiscFunctions.sort_indices(ensembleValues)
     newObservationLikelihood = [observationLikelihood[indices[i]] for i in range(ensembleLength)]
@@ -192,19 +192,26 @@ def obs_inc_rank_histogram(ensembleValues, observationLikelihood, rectangularQua
  
     newEnsemble = []
     for i in range(ensembleLength):
+        found = False
         passedMass = (i+1)/(ensembleLength + 1)         #The amount of mass before each ensemble member.
         if passedMass < cumulativeMass[1]:          #If it's in the left tail
             newEnsemble.append(MiscFunctions.weighted_norm_inverse(leftAmp, leftMean, leftStandardDeviation, passedMass))
+            found = True
         elif passedMass > cumulativeMass[-2]:       #If it's in the right tail
             newEnsemble.append(MiscFunctions.weighted_norm_inverse(rightAmp, rightMean, rightStandardDeviation, 1-passedMass))
             newEnsemble[-1] = 2*rightMean - newEnsemble[-1]
+            found = True
         else:                                       #If it's in one of the uniform boxes in the middle.
             for cumulativeMassIndex in range(2, len(cumulativeMass)):  #Ignore mass after last ensemble point.
-                if passedMass >= cumulativeMass[cumulativeMassIndex - 1] and passedMass <= cumulativeMass[cumulativeMassIndex]:     #If the mass is greater than the total mass up to a point but less than the total mass after a point: 
+                if passedMass >= cumulativeMass[cumulativeMassIndex - 1] and passedMass <= cumulativeMass[cumulativeMassIndex] and not found:     #If the mass is greater than the total mass up to a point but less than the total mass after a point: 
                 
                     if rectangularQuadrature:
                         ensemblePointIndex = cumulativeMassIndex - 2    #The index of the ensemble point to the left of the area and also of the height of the bin.
-                        newEnsemble.append(sortedEnsemble[ensemblePointIndex] + (passedMass-cumulativeMass[cumulativeMassIndex-1])/(cumulativeMass[cumulativeMassIndex] - cumulativeMass[cumulativeMassIndex-1])*(sortedEnsemble[ensemblePointIndex+1] - sortedEnsemble[ensemblePointIndex]))
+                        try:
+                            newEnsemble.append(sortedEnsemble[ensemblePointIndex] + (passedMass-cumulativeMass[cumulativeMassIndex-1])/(cumulativeMass[cumulativeMassIndex] - cumulativeMass[cumulativeMassIndex-1])*(sortedEnsemble[ensemblePointIndex+1] - sortedEnsemble[ensemblePointIndex]))
+                            found = True
+                        except IndexError:
+                            print(len(sortedEnsemble), len(cumulativeMass), ensemblePointIndex, cumulativeMassIndex)
                     else:
                         #We're using trapezoidal quadrature to get the new point. 
                         #box is index of cumulative mass, box - 1 is ensemble point
@@ -220,8 +227,10 @@ def obs_inc_rank_histogram(ensembleValues, observationLikelihood, rectangularQua
                         root2 += sortedEnsemble[ensemblePointIndex]
                         if root1 >= sortedEnsemble[ensemblePointIndex] and root1 <= sortedEnsemble[ensemblePointIndex + 1]:
                             newEnsemble.append(root1)
+                            found = True
                         elif root2 >= sortedEnsemble[ensemblePointIndex] and root2 <= sortedEnsemble[ensemblePointIndex + 1]:
                             newEnsemble.append(root2)
+                            found = True
                         else:
                             raise ValueError("Rank Histogram Filter was unable to get a satisfactory root for trapezoidal interpolation.")
                     

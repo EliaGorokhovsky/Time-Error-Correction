@@ -17,7 +17,7 @@ def obs_inc_rank_histogram(ensembleValues, observationLikelihood, rectangularQua
     Returns list of observation ecrements of equal length to ensembleValues.
     """
     #Priors
-    ensembleSpread = np.std(ensembleValues)
+    ensembleSpread = np.std(ensembleValues, ddof=1)
     print("Ensemble Spread:", ensembleSpread)
     ensembleLength = len(ensembleValues)
     print("EnsembleLength:", ensembleLength)
@@ -128,9 +128,9 @@ def obs_inc_rank_histogram(ensembleValues, observationLikelihood, rectangularQua
     observationIncrements = [None for i in range(len(indices))]
     for i in range(len(indices)):
         observationIncrements[indices[i]] = sortedObservationIncrements[i]        
-    print("New Ensemble: N(",np.mean(newEnsemble),np.std(newEnsemble),")")
+    print("New Ensemble: N(",np.mean(newEnsemble),np.std(newEnsemble, ddof=1),")")
     #print("New Ensemble:", newEnsemble)
     return observationIncrements
     
 ens = [0, -1, 1, 2, -2]                        
-print(obs_inc_rank_histogram(ens, mlab.normpdf(np.array(ens), 4, 2), True))
+print(obs_inc_rank_histogram(ens, mlab.normpdf(np.array(ens), 6, 2), True))

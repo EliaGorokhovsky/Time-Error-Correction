@@ -120,9 +120,9 @@ class Process:
                 else:
                     ensemble = self.assimilationMethod(ensemble, self.obsList[self.obsTimeList.index(round(time, 5))], np.array(reportedError), observedStatus)
                 #ensembleValues = AnalysisOperations.get_var_lists_from_points(ensemble)
-                #print("Assimilated X from N("+str(np.mean(previousEnsemble[0]))+"|"+str(np.std(previousEnsemble[0]))+") to N(" + str(np.mean(ensembleValues[0]))+"|"+str(np.std(ensembleValues[0]))+") using observation N(" + str(self.obsList[self.obsTimeList.index(round(time, 5))][0])+"|"+str(reportedError[0])+") at time", time)
-                #print("Assimilated Y from N("+str(np.mean(previousEnsemble[1]))+"|"+str(np.std(previousEnsemble[1]))+") to N(" + str(np.mean(ensembleValues[1]))+"|"+str(np.std(ensembleValues[1]))+") using observation " + str(self.obsList[self.obsTimeList.index(round(time, 5))][1]))
-                #print("Assimilated Z from N("+str(np.mean(previousEnsemble[2]))+"|"+str(np.std(previousEnsemble[2]))+") to N(" + str(np.mean(ensembleValues[2]))+"|"+str(np.std(ensembleValues[2]))+") using observation " + str(self.obsList[self.obsTimeList.index(round(time, 5))][2]))
+                #print("Assimilated X from N("+str(np.mean(previousEnsemble[0]))+"|"+str(np.std(previousEnsemble[0]), ddof=1)+") to N(" + str(np.mean(ensembleValues[0]))+"|"+str(np.std(ensembleValues[0]), ddof=1)+") using observation N(" + str(self.obsList[self.obsTimeList.index(round(time, 5))][0])+"|"+str(reportedError[0])+") at time", time)
+                #print("Assimilated Y from N("+str(np.mean(previousEnsemble[1]))+"|"+str(np.std(previousEnsemble[1]), ddof=1)+") to N(" + str(np.mean(ensembleValues[1]))+"|"+str(np.std(ensembleValues[1]), ddof=1)+") using observation " + str(self.obsList[self.obsTimeList.index(round(time, 5))][1]))
+                #print("Assimilated Z from N("+str(np.mean(previousEnsemble[2]))+"|"+str(np.std(previousEnsemble[2]), ddof=1)+") to N(" + str(np.mean(ensembleValues[2]))+"|"+str(np.std(ensembleValues[2]), ddof=1)+") using observation " + str(self.obsList[self.obsTimeList.index(round(time, 5))][2]))
                 #print("Assimilated from", previousEnsemble, "to", ensembleValues, "using observation", self.obsList[self.obsTimeList.index(round(time, 5))])
             self.ensembleList.append(EnsembleOperations.copy_ensemble(ensemble))
             self.ensembleTimeList.append(time)

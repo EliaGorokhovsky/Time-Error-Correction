@@ -80,7 +80,7 @@ def rank_histogram(binList, colors, linewidths, **kwargs):
     fig = plot.figure()
     ax = fig.gca()
     widths = [binList[i+1] - binList[i] for i in range(len(binList)-1)]
-    normalFit = mlab.normpdf(binList, np.mean(binList), np.std(binList))
+    normalFit = mlab.normpdf(binList, np.mean(binList), np.std(binList, ddof=1))
     ax.plot(binList, normalFit, "r--")   
     areaValue = 1/len(widths)    
     ax.bar(binList[:-1], [areaValue/widths[i] for i in range(len(widths))], width=widths, color=colors, linewidth=linewidths)
@@ -111,7 +111,7 @@ def kernel_density_estimation(points, colors, bandwidths, lineWidths, lineStyles
 #        ax.plot(newPoints, probabilityValues, color=colors[dataset], linestyle = lineStyles[dataset], linewidth=lineWidths[dataset], label=labels[dataset])
         probabilityValues = stats.gaussian_kde(points, bw_method="silverman")
         ax.plot(points, probabilityValues(points), color=colors[dataset], linestyle = lineStyles[dataset], linewidth=lineWidths[dataset], label=labels[dataset])
-    normalFit = mlab.normpdf(points, np.mean(points), np.std(points))
+    normalFit = mlab.normpdf(points, np.mean(points), np.std(points, ddof=1))
     ax.plot(points, normalFit, "r--", label="Gaussian Fit to Data")   
     legend = ax.legend(loc='upper right', shadow=True)
     frame = legend.get_frame()
