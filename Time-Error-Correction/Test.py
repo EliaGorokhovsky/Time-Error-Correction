@@ -6,7 +6,7 @@ import Graphics
 import AnalysisOperations
 
 Experiment = Process.Process(False)
-error = [1, 1, 1, 0.1]
+error = [1, 1, 1, 0.05]
 startTime = 0
 endTime = 200
 Experiment.choose_methods(system="L63+time", integration="RK4", assimilation="EAKF")
@@ -16,7 +16,7 @@ truthLists = AnalysisOperations.get_var_lists_from_points(truthList)
 obsList, obsTimeList = Experiment.get_observations(0.5, error, ["State", "State", "State", "Time"])
 print("Observations Generated")
 obsLists = AnalysisOperations.get_var_lists_from_points(obsList)
-ensembleList, ensembleTimeList = Experiment.run_ensemble(startTime, endTime, 0.01, 80, error, error, obsList[0], [True, True, True, False], [2, 2, 2, 0])
+ensembleList, ensembleTimeList = Experiment.run_ensemble(startTime, endTime, 0.01, 80, error, [1,1,1,0], obsList[0], [True, True, True, False], [1.5, 1.5, 1.5, 0])
 print("Ensemble Run")
 ensembleMeans = Experiment.get_ensemble_means()
 ensembleMeansLists = AnalysisOperations.get_var_lists_from_points(ensembleMeans)
