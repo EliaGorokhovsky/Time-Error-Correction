@@ -114,9 +114,12 @@ class Process:
             if round(time, 5) in self.obsTimeList and time != 0:
                 ensemble = EnsembleOperations.inflate(ensemble, inflateScalars)
                 #previousEnsemble = AnalysisOperations.get_var_lists_from_points(EnsembleOperations.copy_ensemble(ensemble))
-                if self.experimentalStatus:
+                if self.experimentalStatus and self.assimilationMethod != DataAssimilation.RHF:
                     observation, observationLikelihood = ExperimentalThings.get_adaptive_likelihood(self.obsList[self.obsTimeList.index(round(time, 5))], reportedError, self.errorType, self.dt, self.system, self.integrationMethod, self.systemParameters)
                     ensemble = self.assimilationMethod(ensemble, observation, observationLikelihood, observedStatus)
+                elif self.experimentalStatus and self.assimilationMethod == DataAssimilation.RHF:
+                    observationLikelihood = ExperimentalThings.get_adaptive_likelihood(self.obsList[self.obsTimeList.index(round(time, 5))], reportedError, self.errorType, self.dt, self.system, self.integrationMethod, self.systemParameters, ensemble=ensemble)
+                    ensemble = self.assimilationMethod(ensemble, 0, observationLikelihood, observedStatus)
                 else:
                     ensemble = self.assimilationMethod(ensemble, self.obsList[self.obsTimeList.index(round(time, 5))], np.array(reportedError), observedStatus)
                 #ensembleValues = AnalysisOperations.get_var_lists_from_points(ensemble)

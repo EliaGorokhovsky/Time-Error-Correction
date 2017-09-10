@@ -14,23 +14,24 @@ import Process
 import Systems
 
 #Preconditions for experiment
-assimilationMethods = ["EAKF"]
+assimilationMethods = ["RHF"]
 testingTypes = [True, False]
 stateErrors = [[0.01, 0.01, 0.01], [0.05, 0.05, 0.05], [0.1, 0.1, 0.1]]
-timeErrors = [[0.001*i] for i in range(0, 10)]
+timeErrors = [[0.001*i] for i in range(0, 50)]
 errors = [i+j for i in stateErrors for j in timeErrors]
 startTime = 0
-endTime = 2
+endTime = 200
 observationIntervals = [0.5]
-systems = ["L63+time", "L84+time"]
-trials = 1
+systems = ["L63+time"]
+trials = 3
 
 totalTrials = len(assimilationMethods)*len(testingTypes)*len(stateErrors)*len(timeErrors)*len(observationIntervals)*len(systems)*trials
 #Writing to files
-filename = "DataCollectionTest" + ".csv"
-file = open(filename, "a")
-file.write("testingType, system, assimilationMethod, observationInterval, stateError, timeError, RMSE, \n")
-file.close()
+filename = ""
+if filename != "":
+    file = open(filename + ".csv", "a")
+    file.write("testingType, system, assimilationMethod, observationInterval, stateError, timeError, RMSE, \n")
+    file.close()
 
 trialNum = 0
 print("Starting")
@@ -49,9 +50,10 @@ for testingType in testingTypes:
                         ensembleMeans = Experiment.get_ensemble_means()
                         rmse = AnalysisOperations.get_RMSE(ensembleMeans, truthList, [True, True, True, False])
                         #TODO: Move file writing to its own module
-                        file = open(filename, "a")
-                        file.write(str(testingType) + "," + str(system) + "," + str(assimilationMethod) + "," + str(observationInterval) + "," + str(error[0]) + "," + str(error[3]) + "," + str(rmse) + ",\n")
-                        file.close()    #Free up system resources and make sure not everything is lost if the code errors
+                        if filename != "":
+                            file = open(filename + ".csv", "a")
+                            file.write(str(testingType) + "," + str(system) + "," + str(assimilationMethod) + "," + str(observationInterval) + "," + str(error[0]) + "," + str(error[3]) + "," + str(rmse) + ",\n")
+                            file.close()    #Free up system resources and make sure not everything is lost if the code errors
     
                         #Print progress                        
                         trialNum += 1

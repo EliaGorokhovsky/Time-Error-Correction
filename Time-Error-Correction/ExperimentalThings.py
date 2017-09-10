@@ -34,8 +34,8 @@ def get_adaptive_likelihood(point, error, errorType, dt, system, integration, *p
     else:
         pseudoObservations = [MiscFunctions.generate_typed_error(point, timeError, errorType, dt, system, integration, params) for i in range(amount)]
         varLists = AnalysisOperations.get_var_lists_from_points(pseudoObservations)
-        probabilities = [np.array([0 for j in range(len(kwargs["ensemble"]))]) for i in range(len(varLists))]
-        ensembleValues = AnalysisOperations.get_var_lists_from_points(kwargs["ensemble"])
+        probabilities = [np.array([0.0 for j in range(len(kwargs["ensemble"]))]) for i in range(len(varLists))]
+        ensembleValues = np.array(AnalysisOperations.get_var_lists_from_points(kwargs["ensemble"]))
         for var in range(len(ensembleValues)):
             if errorType[var] != "Time":
                 for point in range(len(pseudoObservations)):
