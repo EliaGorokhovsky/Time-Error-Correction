@@ -15,7 +15,7 @@ import Systems
 
 #Preconditions for experiment
 assimilationMethods = ["RHF"]
-testingTypes = [True, False]
+testingTypes = [False]
 stateErrors = [[0.01, 0.01, 0.01], [0.05, 0.05, 0.05], [0.1, 0.1, 0.1]]
 timeErrors = [[0.001*i] for i in range(0, 50)]
 errors = [i+j for i in stateErrors for j in timeErrors]
@@ -27,7 +27,7 @@ trials = 3
 
 totalTrials = len(assimilationMethods)*len(testingTypes)*len(stateErrors)*len(timeErrors)*len(observationIntervals)*len(systems)*trials
 #Writing to files
-filename = ""
+filename = "DataCollectionRHF"
 if filename != "":
     file = open(filename + ".csv", "a")
     file.write("testingType, system, assimilationMethod, observationInterval, stateError, timeError, RMSE, \n")

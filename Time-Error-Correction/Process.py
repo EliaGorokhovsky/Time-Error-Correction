@@ -117,7 +117,7 @@ class Process:
                 if self.experimentalStatus and self.assimilationMethod != DataAssimilation.RHF:
                     observation, observationLikelihood = ExperimentalThings.get_adaptive_likelihood(self.obsList[self.obsTimeList.index(round(time, 5))], reportedError, self.errorType, self.dt, self.system, self.integrationMethod, self.systemParameters)
                     ensemble = self.assimilationMethod(ensemble, observation, observationLikelihood, observedStatus)
-                elif self.experimentalStatus and self.assimilationMethod == DataAssimilation.RHF:
+                elif self.experimentalStatus:
                     observationLikelihood = ExperimentalThings.get_adaptive_likelihood(self.obsList[self.obsTimeList.index(round(time, 5))], reportedError, self.errorType, self.dt, self.system, self.integrationMethod, self.systemParameters, ensemble=ensemble)
                     ensemble = self.assimilationMethod(ensemble, 0, observationLikelihood, observedStatus)
                 else:

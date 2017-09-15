@@ -43,6 +43,12 @@ def get_adaptive_likelihood(point, error, errorType, dt, system, integration, *p
                     probabilities[var] += normal
                 probabilitySum = sum(probabilities[var])
                 probabilities[var] /= probabilitySum
+                if probabilitySum == 0:
+                    probabilities[var] = np.array([1/len(probabilities[var]) for i in probabilities[var]])
+        for i in probabilities:
+            for j in i:
+                if j < 0:
+                    print("In get_adaptive_likelihood, i=", j)
         return np.array(probabilities)
                     
             

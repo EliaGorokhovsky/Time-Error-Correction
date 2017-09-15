@@ -151,6 +151,8 @@ def obs_inc_rank_histogram(ensembleValues, observationLikelihood, rectangularQua
     Takes one list of values i.e. ensembleValues[i], observation in one variable, and observation likelihood as a list of likelihood with length equal to that of ensembleValues.
     Returns list of observation ecrements of equal length to ensembleValues.
     """
+    if sum(observationLikelihood) == 0:
+        observationLikelihood = [1/len(observationLikelihood) for i in observationLikelihood]
     #Priors
     ensembleSpread = np.std(ensembleValues, ddof=1)
     ensembleLength = len(ensembleValues)
@@ -171,11 +173,13 @@ def obs_inc_rank_histogram(ensembleValues, observationLikelihood, rectangularQua
     leftProductWeight = observationLikelihood[0]    
     rightProductWeight = observationLikelihood[-1]
     #Get the mass in between each bin.
+
+        
     mass = np.array([leftProductWeight/(ensembleLength + 1)] + [likelihoodDensity[i]/(ensembleLength+1) for i in range(len(likelihoodDensity))] + [rightProductWeight/(ensembleLength + 1)])
     
     #Get height and normalize mass for trapezoidal.
     height = np.array([-1 if sortedEnsemble[i+1]==sortedEnsemble[i] else 1/((ensembleLength+1)*(sortedEnsemble[i+1]-sortedEnsemble[i])) for i in range(len(sortedEnsemble)-1)])
-    massSum = sum(mass)    
+    massSum = sum(mass)  
     mass /= massSum
     
     #Get weight for normalized partial Gaussian tails. TODO: Descriptive names
@@ -207,11 +211,8 @@ def obs_inc_rank_histogram(ensembleValues, observationLikelihood, rectangularQua
                 
                     if rectangularQuadrature:
                         ensemblePointIndex = cumulativeMassIndex - 2    #The index of the ensemble point to the left of the area and also of the height of the bin.
-                        try:
-                            newEnsemble.append(sortedEnsemble[ensemblePointIndex] + (passedMass-cumulativeMass[cumulativeMassIndex-1])/(cumulativeMass[cumulativeMassIndex] - cumulativeMass[cumulativeMassIndex-1])*(sortedEnsemble[ensemblePointIndex+1] - sortedEnsemble[ensemblePointIndex]))
-                            found = True
-                        except IndexError:
-                            print(len(sortedEnsemble), len(cumulativeMass), ensemblePointIndex, cumulativeMassIndex)
+                        newEnsemble.append(sortedEnsemble[ensemblePointIndex] + (passedMass-cumulativeMass[cumulativeMassIndex-1])/(cumulativeMass[cumulativeMassIndex] - cumulativeMass[cumulativeMassIndex-1])*(sortedEnsemble[ensemblePointIndex+1] - sortedEnsemble[ensemblePointIndex]))
+                        found = True
                     else:
                         #We're using trapezoidal quadrature to get the new point. 
                         #box is index of cumulative mass, box - 1 is ensemble point
@@ -233,9 +234,16 @@ def obs_inc_rank_histogram(ensembleValues, observationLikelihood, rectangularQua
                             found = True
                         else:
                             raise ValueError("Rank Histogram Filter was unable to get a satisfactory root for trapezoidal interpolation.")
+                elif cumulativeMass[cumulativeMassIndex - 1] > cumulativeMass[cumulativeMassIndex]:
+                    print(cumulativeMass[cumulativeMassIndex - 1], ">", cumulativeMass[cumulativeMassIndex])
                     
     observationIncrements = []
-    sortedObservationIncrements = [newEnsemble[i] - ensembleValues[indices[i]] for i in range(ensembleLength)]
+    try:
+        sortedObservationIncrements = [newEnsemble[i] - ensembleValues[indices[i]] for i in range(ensembleLength)]
+    except IndexError:
+        print(len(newEnsemble), ensembleLength, max(indices))
+        print(cumulativeMass)
+        print(massSum, mass[0])
     observationIncrements = [None for i in range(len(indices))]
     for i in range(len(indices)):
         observationIncrements[indices[i]] = sortedObservationIncrements[i]  

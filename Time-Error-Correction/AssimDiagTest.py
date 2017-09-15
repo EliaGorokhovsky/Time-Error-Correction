@@ -133,4 +133,4 @@ def obs_inc_rank_histogram(ensembleValues, observationLikelihood, rectangularQua
     return observationIncrements
     
 ens = [0, -1, 1, 2, -2]                        
-#print(obs_inc_rank_histogram(ens, mlab.normpdf(np.array(ens), 6, 2), True))
+#print(obs_inc_rank_histogram(ens, np.array(), 6, 2), True))
