@@ -151,8 +151,9 @@ def obs_inc_rank_histogram(ensembleValues, observationLikelihood, rectangularQua
     Takes one list of values i.e. ensembleValues[i], observation in one variable, and observation likelihood as a list of likelihood with length equal to that of ensembleValues.
     Returns list of observation ecrements of equal length to ensembleValues.
     """
-    if sum(observationLikelihood) == 0:
-        observationLikelihood = [1/len(observationLikelihood) for i in observationLikelihood]
+    for i in observationLikelihood:
+        if i == 0:
+            i = 0.05
     #Priors
     ensembleSpread = np.std(ensembleValues, ddof=1)
     ensembleLength = len(ensembleValues)
