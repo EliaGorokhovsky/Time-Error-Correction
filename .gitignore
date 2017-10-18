@@ -1,3 +1,21 @@
 
 .spyderworkspace
 Time-Error-Correction/.spyderproject
+
+DataAnalysis/\.spyderproject
+
+Time-Error-Correction/__pycache__/DataAssimilation\.cpython-35\.pyc
+
+Time-Error-Correction/DataCollectionEAKF\.csv
+
+Time-Error-Correction/DataCollectionEAKF2\.csv
+
+Time-Error-Correction/DataCollectionEAKF3\.csv
+
+Time-Error-Correction/DataCollectionRHF\.csv
+
+Time-Error-Correction/DataCollectionRHF3\.csv
+
+Time-Error-Correction/DataCollectionRHF4\.csv
+
+*.csv
